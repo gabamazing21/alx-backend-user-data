@@ -4,6 +4,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
+from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.orm.exc import NoResultFound
+from typing import Any
 
 from user import Base, User
 
@@ -35,6 +38,13 @@ class DB:
         """
         self._session
         user = User(email=email, hashed_password=hashed_password)
-        self.__session.add(user)
+        self._session.add(user)
         self._session.commit()
+        return user
+
+    def find_user_by(self, **kwargs: Any) -> User:
+        """
+        filter quary
+        """
+        user = self._session.query(User).filter_by(**kwargs).one()
         return user
