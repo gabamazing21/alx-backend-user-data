@@ -48,7 +48,7 @@ class DB:
         """
         user = self._session.query(User).filter_by(**kwargs).one()
         return user
-    
+
     def update_user(self, user_id: int, **kwargs):
         """
         update user
