@@ -2,6 +2,7 @@ import bcrypt
 from db import DB
 from user import User
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+import uuid
 """
 this module for authencation"""
 
@@ -40,3 +41,18 @@ class Auth:
             return is_valid
         except NoResultFound:
             return False
+
+    def _generate_uuid(self) -> str:
+        return str(uuid.uuid4())
+    
+    def create_session(self, email: str) -> str:
+       """
+       generate a session id using uuid
+       """
+       try:
+            user = self._db.find_user_by(email=email)
+            session_id = self._generate_uuid()
+            self._db.update_user(user.id, session_id=session_id)
+            return session_id
+       except NoResultFound:
+           return None
