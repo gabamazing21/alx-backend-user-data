@@ -8,7 +8,7 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm.exc import NoResultFound
 from typing import Any
 
-from user import Base, User
+from user import User, Base
 
 
 class DB:
@@ -46,8 +46,15 @@ class DB:
         """
         filter quary
         """
-        user = self._session.query(User).filter_by(**kwargs).one()
-        return user
+        if not kwargs:
+            raise InvalidRequestError("No arguments provided.")
+        try:
+            user = self._session.query(User).filter_by(**kwargs).one()
+            return user
+        except NoResultFound:
+            raise NoResultFound
+        except Exception:
+            raise InvalidRequestError
 
     def update_user(self, user_id: int, **kwargs):
         """
