@@ -52,9 +52,9 @@ class DB:
             user = self._session.query(User).filter_by(**kwargs).one()
             return user
         except NoResultFound:
-            raise NoResultFound
-        except Exception:
-            raise InvalidRequestError
+            raise NoResultFound()
+        except InvalidRequestError:
+            raise InvalidRequestError()
 
     def update_user(self, user_id: int, **kwargs):
         """
