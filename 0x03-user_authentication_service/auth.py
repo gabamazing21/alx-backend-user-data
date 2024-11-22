@@ -75,8 +75,8 @@ class Auth:
             return None
         except NoResultFound:
             return None
-        
-    def get_reset_password_token (self, email: str) -> str:
+
+    def get_reset_password_token(self, email: str) -> str:
         """generate reset password token"""
         try:
             user = self._db.find_user_by(email=email)
@@ -85,7 +85,7 @@ class Auth:
             return uu_id
         except NoResultFound:
             raise ValueError()
-    
+
     def update_password(self, reset_token: str, password: str):
         """update password with reset token and new password"""
         try:

@@ -76,6 +76,7 @@ def profile():
     logging.debug(f"User found: {user.email}")
     return jsonify({"email": user.email}), 200
 
+
 @app.route('/reset_password', methods=['POST'])
 def get_reset_password_token():
     """route for reset password"""
@@ -85,6 +86,7 @@ def get_reset_password_token():
         return jsonify({"email": email, "reset_token": token})
     except ValueError:
         abort(403)
+
 
 @app.route('/reset_password', methods=['PUT'])
 def get_reset_password_token():
@@ -97,7 +99,6 @@ def get_reset_password_token():
         return jsonify({"email": email, "message": "Password updated"})
     except ValueError:
         abort(403)
-
 
 
 if __name__ == "__main__":
