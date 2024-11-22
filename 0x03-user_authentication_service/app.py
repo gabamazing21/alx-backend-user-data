@@ -2,7 +2,10 @@
 """ setup flask web server"""
 from flask import Flask, jsonify, request, abort, make_response, redirect
 from auth import Auth
+import logging
+
 app = Flask(__name__)
+logging.basicConfig(level=logging.DEBUG)
 AUTH = Auth()
 
 
@@ -38,8 +41,8 @@ def login():
         response = make_response(jsonify(
             {"email": email,
              "message": "logged in"
-             }))
-        response.set_cookie = ("session_id", session_id)
+             }), 200)
+        response.set_cookie("session_id", session_id)
         return response
     else:
         return abort(401)
@@ -57,6 +60,21 @@ def logout():
     response = redirect('/')
     response.delete_cookie('session_id')
     return response
+
+
+@app.route('/profile', methods=["GET"])
+def profile():
+    session_id = request.cookies.get('session_id')
+    logging.debug(f"Session ID from cookie: {session_id}")
+    if not session_id:
+        logging.debug("session_id is not gotten")
+        abort(403)
+    user = AUTH.get_user_from_session_id(session_id)
+    if not user:
+        logging.debug("No user found with the provided session ID.")
+        abort(403)
+    logging.debug(f"User found: {user.email}")
+    return jsonify({"email": user.email}), 200
 
 
 if __name__ == "__main__":
