@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """ setup flask web server"""
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request, abort, make_response, redirect
 from auth import Auth
 app = Flask(__name__)
 AUTH = Auth()
@@ -34,10 +34,29 @@ def login():
     password = request.form.get('password')
 
     if (AUTH.valid_login(email, password)):
-        AUTH.create_session(email)
-        return jsonify({"email": email, "message": "logged in"})
+        session_id = AUTH.create_session(email)
+        response = make_response(jsonify(
+            {"email": email,
+             "message": "logged in"
+             }))
+        response.set_cookie = ("session_id", session_id)
+        return response
     else:
         return abort(401)
+
+
+@app.route('/sessions', methods=['DELETE'])
+def logout():
+    session_id = request.cookies.get('session_id')
+    if not session_id:
+        abort(403)
+    user = AUTH.get_user_from_session_id(session_id)
+    if not user:
+        abort(403)
+    AUTH.destroy_session(user.id)
+    response = redirect('/')
+    response.delete_cookie('session_id')
+    return response
 
 
 if __name__ == "__main__":
