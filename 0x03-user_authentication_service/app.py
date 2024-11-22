@@ -76,6 +76,29 @@ def profile():
     logging.debug(f"User found: {user.email}")
     return jsonify({"email": user.email}), 200
 
+@app.route('/reset_password', methods=['POST'])
+def get_reset_password_token():
+    """route for reset password"""
+    email = request.form.get('email')
+    try:
+        token = AUTH.get_reset_password_token(email)
+        return jsonify({"email": email, "reset_token": token})
+    except ValueError:
+        abort(403)
+
+@app.route('/reset_password', methods=['PUT'])
+def get_reset_password_token():
+    """route for update password"""
+    email = request.form.get('email')
+    reset_token = request.form.get('reset_token')
+    new_password = request.form.get('new_password')
+    try:
+        AUTH.update_password(reset_token, new_password)
+        return jsonify({"email": email, "message": "Password updated"})
+    except ValueError:
+        abort(403)
+
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="5000")
